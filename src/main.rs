@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::input::mouse::MouseWheel;
 use rand::Rng;
 
 fn main() {
@@ -11,6 +12,7 @@ fn main() {
                 spaceship_input,
                 apply_physics,
                 camera_follow,
+                camera_zoom
             ),
         )
         .run();
@@ -143,6 +145,23 @@ fn camera_follow(
     cam_transform.translation = cam_transform
         .translation
         .lerp(ship_transform.translation, follow_strength * dt);
+}
+
+fn camera_zoom(
+    mut scroll_evr: EventReader<MouseWheel>,
+    keyboard: Res<ButtonInput<KeyCode>>,
+    mut query: Query<&mut OrthographicProjection, With<MainCamera>>,
+) {
+    let mut cam = query.single_mut();
+
+    // Only zoom if Ctrl is held
+    if keyboard.pressed(KeyCode::ControlLeft) || keyboard.pressed(KeyCode::ControlRight) {
+        for ev in scroll_evr.read() {
+            // Adjust scale (smaller = zoom in, larger = zoom out)
+            cam.scale -= ev.y * 0.1;
+            cam.scale = cam.scale.clamp(0.5, 5.0); // limit zoom
+        }
+    }
 }
 
 /* ===================== BACKGROUND ===================== */
