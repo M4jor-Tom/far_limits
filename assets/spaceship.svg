@@ -1,0 +1,54 @@
+<svg
+    width="128"
+    height="128"
+    viewBox="0 0 128 128"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <!-- Body -->
+    <path
+        d="M64 4
+           C52 20, 48 40, 48 64
+           C48 88, 56 112, 64 124
+           C72 112, 80 88, 80 64
+           C80 40, 76 20, 64 4 Z"
+        fill="#cfd8dc"
+        stroke="#263238"
+        stroke-width="3"
+    />
+
+    <!-- Cockpit -->
+    <ellipse
+        cx="64"
+        cy="48"
+        rx="10"
+        ry="16"
+        fill="#4fc3f7"
+        stroke="#01579b"
+        stroke-width="2"
+    />
+
+    <!-- Left wing -->
+    <polygon
+        points="48,70 20,88 48,88"
+        fill="#b0bec5"
+        stroke="#263238"
+        stroke-width="3"
+    />
+
+    <!-- Right wing -->
+    <polygon
+        points="80,70 108,88 80,88"
+        fill="#b0bec5"
+        stroke="#263238"
+        stroke-width="3"
+    />
+
+    <!-- Engine glow -->
+    <ellipse
+        cx="64"
+        cy="118"
+        rx="6"
+        ry="10"
+        fill="#ff8a65"
+    />
+</svg>
