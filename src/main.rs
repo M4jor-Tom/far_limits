@@ -14,7 +14,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((
         SpriteBundle {
             texture: asset_server.load("spaceship.png"),
-            transform: Transform::from_scale(Vec3::splat(2.0)),
+            transform: Transform::from_scale(Vec3::splat(0.5)),
             ..default()
         },
         Spaceship
@@ -25,30 +25,50 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 struct Spaceship;
 
 fn spaceship_movement(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
+    keyboard: Res<ButtonInput<KeyCode>>,
     mut query: Query<&mut Transform, With<Spaceship>>,
     time: Res<Time>,
 ) {
     let mut transform = query.single_mut();
 
-    let speed = 300.0; // pixels per second
-    let mut direction = Vec3::ZERO;
+    let thrust_speed = 400.0;
+    let side_thrust_speed = 300.0;
+    let rotation_speed = 3.5;
 
-    if keyboard_input.pressed(KeyCode::KeyW) {
-        direction.y += 1.0;
+    let dt = time.delta_seconds();
+
+    // -------- Rotation --------
+    if keyboard.pressed(KeyCode::KeyQ) {
+        transform.rotate_z(rotation_speed * dt);
     }
-    if keyboard_input.pressed(KeyCode::KeyS) {
-        direction.y -= 1.0;
-    }
-    if keyboard_input.pressed(KeyCode::KeyA) {
-        direction.x -= 1.0;
-    }
-    if keyboard_input.pressed(KeyCode::KeyD) {
-        direction.x += 1.0;
+    if keyboard.pressed(KeyCode::KeyE) {
+        transform.rotate_z(-rotation_speed * dt);
     }
 
-    if direction != Vec3::ZERO {
-        direction = direction.normalize(); // prevents faster diagonal movement
-        transform.translation += direction * speed * time.delta_seconds();
+    // -------- Local directions --------
+    let forward = transform.rotation * Vec3::Y;
+    let right = transform.rotation * Vec3::X;
+
+    // -------- Forward / backward thrust --------
+    let mut forward_thrust = 0.0;
+    if keyboard.pressed(KeyCode::KeyW) {
+        forward_thrust += 1.0;
     }
+    if keyboard.pressed(KeyCode::KeyS) {
+        forward_thrust -= 1.0;
+    }
+
+    // -------- Side thrusters --------
+    let mut side_thrust = 0.0;
+    if keyboard.pressed(KeyCode::KeyD) {
+        side_thrust += 1.0;
+    }
+    if keyboard.pressed(KeyCode::KeyA) {
+        side_thrust -= 1.0;
+    }
+
+    // -------- Apply movement --------
+    transform.translation +=
+        forward * forward_thrust * thrust_speed * dt +
+        right * side_thrust * side_thrust_speed * dt;
 }
