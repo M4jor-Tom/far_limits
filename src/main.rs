@@ -1,74 +1,168 @@
 use bevy::prelude::*;
+use rand::Rng;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, setup)
-        .add_systems(Update, spaceship_movement)
+        .add_systems(
+            Update,
+            (
+                spaceship_input,
+                apply_physics,
+                camera_follow,
+            ),
+        )
         .run();
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2dBundle::default());
-
-    commands.spawn((
-        SpriteBundle {
-            texture: asset_server.load("spaceship.png"),
-            transform: Transform::from_scale(Vec3::splat(0.5)),
-            ..default()
-        },
-        Spaceship
-    ));
-}
+/* ===================== COMPONENTS ===================== */
 
 #[derive(Component)]
 struct Spaceship;
 
-fn spaceship_movement(
+#[derive(Component, Default)]
+struct Velocity(Vec2);
+
+#[derive(Component, Default)]
+struct AngularVelocity(f32);
+
+#[derive(Component)]
+struct MainCamera;
+
+/* ===================== SETUP ===================== */
+
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    // Camera
+    commands.spawn((
+        Camera2dBundle::default(),
+        MainCamera,
+    ));
+
+    // Spaceship
+    commands.spawn((
+        SpriteBundle {
+            texture: asset_server.load("spaceship.png"),
+            transform: Transform::from_scale(Vec3::splat(2.0)),
+            ..default()
+        },
+        Spaceship,
+        Velocity::default(),
+        AngularVelocity::default(),
+    ));
+
+    // Starfield background
+    spawn_starfield(&mut commands);
+}
+
+/* ===================== INPUT ===================== */
+
+fn spaceship_input(
     keyboard: Res<ButtonInput<KeyCode>>,
-    mut query: Query<&mut Transform, With<Spaceship>>,
+    mut query: Query<(
+        &Transform,
+        &mut Velocity,
+        &mut AngularVelocity,
+    ), With<Spaceship>>,
     time: Res<Time>,
 ) {
-    let mut transform = query.single_mut();
-
-    let thrust_speed = 400.0;
-    let side_thrust_speed = 300.0;
-    let rotation_speed = 3.5;
+    let (transform, mut velocity, mut angular_velocity) = query.single_mut();
 
     let dt = time.delta_seconds();
 
-    // -------- Rotation --------
-    if keyboard.pressed(KeyCode::KeyQ) {
-        transform.rotate_z(rotation_speed * dt);
-    }
-    if keyboard.pressed(KeyCode::KeyE) {
-        transform.rotate_z(-rotation_speed * dt);
-    }
+    let thrust = 600.0;
+    let side_thrust = 450.0;
+    let rotation_thrust = 6.0;
 
-    // -------- Local directions --------
+    // Local axes
     let forward = transform.rotation * Vec3::Y;
     let right = transform.rotation * Vec3::X;
 
+    // -------- Rotation inertia --------
+    if keyboard.pressed(KeyCode::KeyA) {
+        angular_velocity.0 += rotation_thrust * dt;
+    }
+    if keyboard.pressed(KeyCode::KeyD) {
+        angular_velocity.0 -= rotation_thrust * dt;
+    }
+
     // -------- Forward / backward thrust --------
-    let mut forward_thrust = 0.0;
     if keyboard.pressed(KeyCode::KeyW) {
-        forward_thrust += 1.0;
+        velocity.0 += forward.truncate() * thrust * dt;
     }
     if keyboard.pressed(KeyCode::KeyS) {
-        forward_thrust -= 1.0;
+        velocity.0 -= forward.truncate() * thrust * dt;
     }
 
     // -------- Side thrusters --------
-    let mut side_thrust = 0.0;
-    if keyboard.pressed(KeyCode::KeyD) {
-        side_thrust += 1.0;
+    if keyboard.pressed(KeyCode::KeyQ) {
+        velocity.0 -= right.truncate() * side_thrust * dt;
     }
-    if keyboard.pressed(KeyCode::KeyA) {
-        side_thrust -= 1.0;
+    if keyboard.pressed(KeyCode::KeyE) {
+        velocity.0 += right.truncate() * side_thrust * dt;
     }
+}
 
-    // -------- Apply movement --------
-    transform.translation +=
-        forward * forward_thrust * thrust_speed * dt +
-        right * side_thrust * side_thrust_speed * dt;
+/* ===================== PHYSICS ===================== */
+
+fn apply_physics(
+    mut query: Query<(
+        &mut Transform,
+        &mut Velocity,
+        &mut AngularVelocity,
+    ), With<Spaceship>>,
+    time: Res<Time>,
+) {
+    let (mut transform, mut velocity, mut angular_velocity) =
+        query.single_mut();
+
+    let dt = time.delta_seconds();
+
+    // Apply movement
+    transform.translation += velocity.0.extend(0.0) * dt;
+    transform.rotate_z(angular_velocity.0 * dt);
+
+    // Damping (space drag / stabilization)
+    velocity.0 *= 0.99;
+    angular_velocity.0 *= 0.95;
+}
+
+/* ===================== CAMERA ===================== */
+
+fn camera_follow(
+    mut cam_query: Query<&mut Transform, (With<MainCamera>, Without<Spaceship>)>,
+    ship_query: Query<&Transform, With<Spaceship>>,
+    time: Res<Time>,
+) {
+    let mut cam_transform = cam_query.single_mut();
+    let ship_transform = ship_query.single();
+
+    let dt = time.delta_seconds();
+    let follow_strength = 5.0;
+
+    cam_transform.translation = cam_transform
+        .translation
+        .lerp(ship_transform.translation, follow_strength * dt);
+}
+
+/* ===================== BACKGROUND ===================== */
+
+fn spawn_starfield(commands: &mut Commands) {
+    let mut rng = rand::rng();
+
+    for _ in 0..400 {
+        let x = rng.random_range(-4000.0..4000.0);
+        let y = rng.random_range(-4000.0..4000.0);
+        let size = rng.random_range(0.5..2.0);
+
+        commands.spawn(SpriteBundle {
+            sprite: Sprite {
+                color: Color::WHITE,
+                custom_size: Some(Vec2::splat(size)),
+                ..default()
+            },
+            transform: Transform::from_translation(Vec3::new(x, y, -10.0)),
+            ..default()
+        });
+    }
 }
