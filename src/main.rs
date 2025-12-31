@@ -1,11 +1,13 @@
 use bevy::prelude::*;
 
+mod constants;
 mod components;
 mod setup;
 mod input;
 mod physics;
 mod camera;
 mod background;
+mod stellar_system;
 
 use setup::setup;
 use input::spaceship_input;

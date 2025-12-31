@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use crate::components::*;
 use crate::background::spawn_starfield;
+use crate::constants::SPACESHIP_ASSET;
+use crate::stellar_system::spawn_asteroids;
 
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera
@@ -12,7 +14,7 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Spaceship
     commands.spawn((
         SpriteBundle {
-            texture: asset_server.load("spaceship.png"),
+            texture: asset_server.load(SPACESHIP_ASSET),
             transform: Transform::from_scale(Vec3::splat(2.0)),
             ..default()
         },
@@ -20,6 +22,9 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         Velocity::default(),
         AngularVelocity::default(),
     ));
+
+    // Asteroids
+    spawn_asteroids(&mut commands, asset_server);
 
     // Background
     spawn_starfield(&mut commands);

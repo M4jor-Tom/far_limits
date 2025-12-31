@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Asteroid base shape -->
+  <polygon points="64,10 90,20 110,50 100,80 70,110 40,100 20,70 25,35" 
+           fill="#333333" stroke="#111111" stroke-width="2"/>
+  
+  <!-- Craters -->
+  <circle cx="55" cy="45" r="5" fill="#222222"/>
+  <circle cx="80" cy="65" r="4" fill="#111111"/>
+  <circle cx="60" cy="90" r="6" fill="#444444"/>
+  <circle cx="40" cy="75" r="3" fill="#222222"/>
+</svg>
