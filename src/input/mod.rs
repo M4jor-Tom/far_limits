@@ -13,9 +13,9 @@ pub fn spaceship_input(
     let (transform, mut velocity, mut angular_velocity) = query.single_mut();
     let dt = time.delta_seconds();
 
-    let thrust = 600.0;
-    let side_thrust = 450.0;
-    let rotation_thrust = 6.0;
+    let thrust: f32 = 600.0;
+    let side_thrust: f32 = 450.0;
+    let rotation_thrust: f32 = 6.0;
 
     let forward = transform.rotation * Vec3::Y;
     let right = transform.rotation * Vec3::X;

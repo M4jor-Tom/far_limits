@@ -11,7 +11,7 @@ pub fn camera_follow(
     let ship_transform = ship_query.single();
 
     let dt = time.delta_seconds();
-    let follow_strength = 5.0;
+    let follow_strength: f32 = 5.0;
 
     cam_transform.translation =
         cam_transform.translation.lerp(ship_transform.translation, follow_strength * dt);

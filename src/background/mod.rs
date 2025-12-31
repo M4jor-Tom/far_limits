@@ -2,12 +2,12 @@ use bevy::prelude::*;
 use rand::Rng;
 
 pub fn spawn_starfield(commands: &mut Commands) {
-    let mut rng = rand::rng();
+    let mut rng: rand::prelude::ThreadRng = rand::rng();
 
     for _ in 0..400 {
-        let x = rng.random_range(-4000.0..4000.0);
-        let y = rng.random_range(-4000.0..4000.0);
-        let size = rng.random_range(0.5..2.0);
+        let x: f32 = rng.random_range(-4000.0..4000.0);
+        let y: f32 = rng.random_range(-4000.0..4000.0);
+        let size: f32 = rng.random_range(0.5..2.0);
 
         commands.spawn(SpriteBundle {
             sprite: Sprite {
