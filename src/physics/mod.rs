@@ -9,8 +9,10 @@ pub fn apply_physics(
     ), With<Spaceship>>,
     time: Res<Time>,
 ) {
-    let (mut transform, mut velocity, mut angular_velocity) = query.single_mut();
-    let dt = time.delta_seconds();
+    let Ok((mut transform, mut velocity, mut angular_velocity)) = query.single_mut() else {
+        return;
+    };
+    let dt = time.delta_secs();
 
     transform.translation += velocity.0.extend(0.0) * dt;
     transform.rotate_z(angular_velocity.0 * dt);

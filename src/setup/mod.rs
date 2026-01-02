@@ -7,17 +7,18 @@ use crate::stellar_system::spawn_asteroids;
 pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // Camera
     commands.spawn((
-        Camera2dBundle::default(),
+        Camera2d::default(),
         MainCamera,
     ));
 
     // Spaceship
     commands.spawn((
-        SpriteBundle {
-            texture: asset_server.load(SPACESHIP_ASSET),
-            transform: Transform::from_scale(Vec3::splat(2.0)),
+        Sprite {
+            image: asset_server.load(SPACESHIP_ASSET),
             ..default()
         },
+        Transform::from_scale(Vec3::splat(2.0)),
+        GlobalTransform::default(),
         Spaceship,
         Velocity::default(),
         AngularVelocity::default(),

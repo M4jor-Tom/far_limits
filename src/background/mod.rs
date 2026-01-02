@@ -9,14 +9,14 @@ pub fn spawn_starfield(commands: &mut Commands) {
         let y: f32 = rng.random_range(-4000.0..4000.0);
         let size: f32 = rng.random_range(0.5..2.0);
 
-        commands.spawn(SpriteBundle {
-            sprite: Sprite {
+        commands.spawn((
+            Sprite {
                 color: Color::WHITE,
                 custom_size: Some(Vec2::splat(size)),
                 ..default()
             },
-            transform: Transform::from_translation(Vec3::new(x, y, -10.0)),
-            ..default()
-        });
+            Transform::from_translation(Vec3::new(x, y, -10.0)),
+            GlobalTransform::default(),
+        ));
     }
 }

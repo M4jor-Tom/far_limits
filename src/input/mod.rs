@@ -10,8 +10,10 @@ pub fn spaceship_input(
     ), With<Spaceship>>,
     time: Res<Time>,
 ) {
-    let (transform, mut velocity, mut angular_velocity) = query.single_mut();
-    let dt = time.delta_seconds();
+    let Ok((transform, mut velocity, mut angular_velocity)) = query.single_mut() else {
+        return;
+    };
+    let dt = time.delta_secs();
 
     let thrust: f32 = 600.0;
     let side_thrust: f32 = 450.0;

@@ -19,11 +19,12 @@ pub fn spawn_asteroids(commands: &mut Commands, asset_server: Res<AssetServer>) 
         };
 
         commands.spawn((
-                SpriteBundle {
-                texture: asset_server.load(asteroid_asset),
-                transform: Transform::from_translation(Vec3::new(x, y, -10.0)),
+                Sprite {
+                image: asset_server.load(asteroid_asset),
                 ..default()
             },
+            Transform::from_translation(Vec3::new(x, y, -10.0)),
+            GlobalTransform::default(),
             Asteroid
         ));
     }
