@@ -10,7 +10,6 @@
       packages = with pkgs; [
         rustc
         cargo
-        rustup
 
         pkg-config
 
@@ -37,7 +36,6 @@
       ];
 
       shellHook = ''
-        rustup component add rust-src
         export LD_LIBRARY_PATH=${pkgs.lib.makeLibraryPath [
           pkgs.libxkbcommon
           pkgs.xorg.libX11
