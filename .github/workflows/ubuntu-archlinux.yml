@@ -24,7 +24,8 @@ jobs:
           base-devel \
           rust \
           pkgconf \
-          alsa-lib
+          alsa-lib \
+          wayland
     - name: Build
       run: cargo build --verbose
     - name: Run tests
