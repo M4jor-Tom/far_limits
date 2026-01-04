@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 mod constants;
 mod components;
@@ -17,6 +18,10 @@ use camera::{camera_follow, camera_zoom};
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins((
+            RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(50.0),
+            RapierDebugRenderPlugin::default(),
+        ))
         .add_systems(Startup, setup)
         .add_systems(
             Update,

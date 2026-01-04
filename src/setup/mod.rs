@@ -1,5 +1,6 @@
-use bevy::prelude::*;
-use crate::components::*;
+use bevy::prelude::{Commands, Sprite, Camera2d, Res, AssetServer, Transform, default};
+use bevy_rapier2d::prelude::*;
+use crate::components::{MainCamera, Spaceship};
 use crate::background::spawn_starfield;
 use crate::constants::SPACESHIP_ASSET;
 use crate::stellar_system::spawn_asteroids;
@@ -17,11 +18,15 @@ pub fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             image: asset_server.load(SPACESHIP_ASSET),
             ..default()
         },
-        Transform::from_scale(Vec3::splat(2.0)),
-        GlobalTransform::default(),
+        Transform::default(),
+        RigidBody::Dynamic,
+        Collider::ball(16.0),
+        Velocity::zero(),
+        Damping {
+            linear_damping: 0.2,
+            angular_damping: 1.0,
+        },
         Spaceship,
-        Velocity::default(),
-        AngularVelocity::default(),
     ));
 
     // Asteroids
