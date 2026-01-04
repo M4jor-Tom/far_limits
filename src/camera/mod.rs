@@ -27,9 +27,13 @@ pub fn camera_zoom(
     spaceship_query: Query<&mut Velocity, With<Spaceship>>,
     mut camera_query: Query<&mut Projection, With<MainCamera>>,
 ) {
-    let mut camera_projection: Mut<Projection> = camera_query.single_mut().expect("REASON");
+    let Ok(mut camera_projection) = camera_query.single_mut() else {
+        return;
+    };
     if let Projection::Orthographic(ref mut orthographic_camera_projection) = *camera_projection {
-        let spaceship_velocity: &Velocity = spaceship_query.single().expect("REASON");
+        let Ok(spaceship_velocity) = spaceship_query.single() else {
+            return;
+        };
         let velocity_threshold_for_camera_zoom: f32 = 0.0;
         let min_camera_scale: f32 = 1.0;
         let max_camera_scale: f32 = 3.0;
