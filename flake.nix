@@ -6,6 +6,24 @@
     system = "x86_64-linux";
     pkgs = nixpkgs.legacyPackages.${system};
   in {
+    packages.${system}.default = pkgs.rustPlatform.buildRustPackage {
+      pname = "far_limits";
+      version = "0.1.0";
+      src = ./.;
+      cargoLock.lockFile = ./Cargo.lock;
+      buildInputs = with pkgs; [
+        alsa-lib
+        systemd
+        libxkbcommon
+        xorg.libX11
+        xorg.libXcursor
+        xorg.libXrandr
+        xorg.libXi
+        wayland
+        vulkan-loader
+      ];
+    };
+
     devShells.${system}.default = pkgs.mkShell {
       packages = with pkgs; [
         rustc
